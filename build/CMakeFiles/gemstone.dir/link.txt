@@ -1,0 +1,1 @@
+/usr/bin/cc -Wl,--dependency-file=CMakeFiles/gemstone.dir/link.d CMakeFiles/gemstone.dir/src/main.c.o CMakeFiles/gemstone.dir/src/server/server.c.o CMakeFiles/gemstone.dir/src/server/output.c.o CMakeFiles/gemstone.dir/src/server/input.c.o CMakeFiles/gemstone.dir/src/server/keyboard.c.o -o gemstone  -lwlroots-0.20 -lwayland-server -lm -lxkbcommon

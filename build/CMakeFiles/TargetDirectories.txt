@@ -1,0 +1,3 @@
+/home/pala/gemstone/build/CMakeFiles/gemstone.dir
+/home/pala/gemstone/build/CMakeFiles/edit_cache.dir
+/home/pala/gemstone/build/CMakeFiles/rebuild_cache.dir
