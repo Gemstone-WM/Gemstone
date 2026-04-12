@@ -7,6 +7,7 @@ struct Output {
     struct wlr_output       *wlr_output;
     struct wlr_scene_output *scene_output;
     struct wl_listener       frame;
+    struct wl_listener       destroy;
 };
 
 void on_new_output(struct wl_listener *listener, void *data);

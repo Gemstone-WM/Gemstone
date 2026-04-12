@@ -13,6 +13,8 @@ add_executable(gemstone
     src/server/output.c
     src/server/input.c
     src/server/keyboard.c
+    src/server/xdg_shell.c
+    src/utils/logger.c
 )
 pkg_check_modules(XKB REQUIRED xkbcommon)
 
