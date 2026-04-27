@@ -151,14 +151,20 @@ static void popup_handle_destroy(struct wl_listener *listener, void *data) {
 static void server_new_xdg_popup(struct wl_listener *listener, void *data) {
     struct wlr_xdg_popup *popup = data;
 
-    // Parent the popup to its parent surface's scene tree so it renders
-    // at the correct position relative to the parent window.
+    // The parent can be either a toplevel or another popup. In both cases
+    // the parent wlr_xdg_surface stores its scene tree in ->data.
+    // We must set popup->base->data after creating the scene node so that
+    // any nested sub-popups can find this popup's scene tree as their parent.
     struct wlr_xdg_surface *parent_xdg =
         wlr_xdg_surface_try_from_wlr_surface(popup->parent);
     if (parent_xdg == NULL || parent_xdg->data == NULL) return;
 
     struct wlr_scene_tree *parent_tree = parent_xdg->data;
-    wlr_scene_xdg_surface_create(parent_tree, popup->base);
+    struct wlr_scene_tree *scene_tree =
+        wlr_scene_xdg_surface_create(parent_tree, popup->base);
+
+    // Store the scene tree so nested sub-popups can parent themselves here.
+    popup->base->data = scene_tree;
 
     // wlroots 0.20: must wait for initial_commit before calling schedule_configure
     struct Popup *p = calloc(1, sizeof(struct Popup));
