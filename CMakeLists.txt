@@ -9,6 +9,7 @@ pkg_check_modules(WAYLAND REQUIRED IMPORTED_TARGET wayland-server)
 add_executable(gemstone 
 src/main.c
 src/listeners.c
+src/server.c
 )
 
 # MUST ACKNOWLEDGE WLROOTS INSTABILITY

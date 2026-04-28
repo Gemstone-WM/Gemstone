@@ -2,6 +2,9 @@
 #include <wlr/types/wlr_output.h>
 #include <wlr/util/log.h>
 
+#include <wlr/types/wlr_xdg_shell.h>
+
+
 // monitor connected event
 void server_new_output(struct wl_listener *listener, void *data) {
     // get the server
@@ -28,4 +31,14 @@ void server_new_output(struct wl_listener *listener, void *data) {
     // applying the stuff
     wlr_output_commit_state(wlr_output, &state);
     wlr_output_state_finish(&state);
+}
+
+void server_new_xdg_surface(struct wl_listener *listener, void *data) {
+    struct gemstone_server *server = wl_container_of(listener, server, new_xdg_surface);
+    struct wlr_xdg_surface *xdg_surface = data;
+
+    wlr_log(WLR_INFO, "Gemstone : New xdg surface created!");
+
+    // sending response back
+    wlr_xdg_surface_schedule_configure(xdg_surface);
 }
