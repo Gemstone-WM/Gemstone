@@ -1,24 +1,21 @@
-cmake_minimum_required(VERSION 3.20)
-project(gemstone)
+cmake_minimum_required(VERSION 3.16)
+project(gemstone C)
 
-set(CMAKE_C_STANDARD 11)
-
+# Find the required packages using pkg-config
 find_package(PkgConfig REQUIRED)
-pkg_check_modules(WLROOTS REQUIRED wlroots-0.20)
-pkg_check_modules(WAYLAND REQUIRED wayland-server)
+pkg_check_modules(WLROOTS REQUIRED IMPORTED_TARGET wlroots-0.20)
+pkg_check_modules(WAYLAND REQUIRED IMPORTED_TARGET wayland-server)
 
-add_executable(gemstone
-    src/main.c
-    src/server/server.c
-    src/server/output.c
-    src/server/input.c
-    src/server/keyboard.c
-    src/server/xdg_shell.c
-    src/utils/logger.c
+add_executable(gemstone 
+src/main.c
+src/listeners.c
 )
-pkg_check_modules(XKB REQUIRED xkbcommon)
 
-target_include_directories(gemstone PRIVATE ${WLROOTS_INCLUDE_DIRS} ${XKB_INCLUDE_DIRS} src)
-target_link_libraries(gemstone PRIVATE ${WLROOTS_LIBRARIES} ${WAYLAND_LIBRARIES} ${XKB_LIBRARIES})
+# MUST ACKNOWLEDGE WLROOTS INSTABILITY
+target_compile_definitions(gemstone PRIVATE WLR_USE_UNSTABLE)
 
-target_compile_options(gemstone PRIVATE ${WLROOTS_CFLAGS_OTHER})
+# Link the libraries to your executable
+target_link_libraries(gemstone
+    PkgConfig::WLROOTS
+    PkgConfig::WAYLAND
+)
