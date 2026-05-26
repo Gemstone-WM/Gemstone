@@ -83,9 +83,6 @@ int init_server()
     server.cursor_motion.notify = server_cursor_motion;
     wl_signal_add(&server.cursor->events.motion, &server.cursor_motion);
 
-    server.cursor_motion.notify = server_cursor_motion;
-    wl_signal_add(&server.cursor->events.motion, &server.cursor_motion);
-    
     // listen to click
     server.cursor_button.notify = server_cursor_button;
     wl_signal_add(&server.cursor->events.button, &server.cursor_button);

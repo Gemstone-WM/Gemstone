@@ -32,6 +32,7 @@ struct gemstone_keyboard {
 
 struct gemstone_windows {
     struct wlr_xdg_toplevel *xdg_toplevel;
+    struct wlr_scene_tree *scene_tree;
     struct Vector2 position;
     struct wl_list link;
     struct wl_listener commit; // waiting for window updates

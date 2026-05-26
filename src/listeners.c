@@ -109,17 +109,14 @@ void server_cursor_motion(struct wl_listener *listener, void *data) {
     wlr_cursor_move(server->cursor, &event->pointer->base, event->delta_x, event->delta_y);
 
     if (server->cursor_mode == GEMSTONE_CURSOR_MOVE && server->grabbed_window != NULL) {
-        // new coords calculations
         int new_x = server->cursor->x - server->grab_x;
         int new_y = server->cursor->y - server->grab_y;
         
-        // update coords
         server->grabbed_window->position.x = new_x;
         server->grabbed_window->position.y = new_y;
         
-        // move window visually
-        wlr_scene_node_set_position(&server->grabbed_window->xdg_toplevel->base->data->node, new_x, new_y);
-        return; // dont click while dragging
+        wlr_scene_node_set_position(&server->grabbed_window->scene_tree->node, new_x, new_y);
+        return; 
     }
 
     double sx, sy;
@@ -280,11 +277,10 @@ void server_new_xdg_toplevel(struct wl_listener *listener, void *data) {
     wl_signal_add(&toplevel->base->surface->events.map, &window->map);
 
     wl_list_insert(&server->windows, &window->link);
-    wlr_scene_xdg_surface_create(&server->scene->tree, toplevel->base);
 
     // attach window to tree
-    struct wlr_scene_tree *scene_tree = wlr_scene_xdg_surface_create(&server->scene->tree, toplevel->base);
-    scene_tree->node.data = window;
+    window->scene_tree = wlr_scene_xdg_surface_create(&server->scene->tree, toplevel->base);
+    window->scene_tree->node.data = window;
 
     wlr_log(WLR_INFO, "Gemstone : New toplevel window created and added to list!");
     
