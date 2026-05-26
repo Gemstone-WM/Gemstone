@@ -4,6 +4,9 @@
 #include <wlr/types/wlr_compositor.h>
 #include <wlr/types/wlr_subcompositor.h>
 #include <wlr/types/wlr_data_device.h>
+
+#include <wlr/types/wlr_xdg_shell.h>
+
 #include <stdlib.h>
 #include <stdio.h>
 
@@ -52,6 +55,48 @@ int init_server()
         goto fail_renderer;
     }
 
+    // xdg stuff
+    wlr_compositor_create(server.wl_display,5,server.renderer);
+    wlr_subcompositor_create(server.wl_display);
+    wlr_data_device_manager_create(server.wl_display);
+
+    // xdg shell
+    server.xdg_shell = wlr_xdg_shell_create(server.wl_display, 3);
+    server.new_xdg_toplevel.notify = server_new_xdg_toplevel;
+
+    // listening for new windows
+    wl_signal_add(&server.xdg_shell->events.new_toplevel, &server.new_xdg_toplevel);
+
+    // window list
+    wl_list_init(&server.windows);
+
+    wl_list_init(&server.outputs);
+    server.scene = wlr_scene_create();
+
+    // cursor stuff
+    server.output_layout = wlr_output_layout_create(server.wl_display);
+    
+    server.cursor = wlr_cursor_create();
+    wlr_cursor_attach_output_layout(server.cursor, server.output_layout);
+    server.cursor_mgr = wlr_xcursor_manager_create(NULL, 24);
+
+    server.cursor_motion.notify = server_cursor_motion;
+    wl_signal_add(&server.cursor->events.motion, &server.cursor_motion);
+
+    server.cursor_motion.notify = server_cursor_motion;
+    wl_signal_add(&server.cursor->events.motion, &server.cursor_motion);
+    
+    // listen to click
+    server.cursor_button.notify = server_cursor_button;
+    wl_signal_add(&server.cursor->events.button, &server.cursor_button);
+
+    // keyboard stuff
+    wl_list_init(&server.keyboards);
+    server.seat = wlr_seat_create(server.wl_display, "seat0");
+    
+    server.new_input.notify = server_new_input;
+    wl_signal_add(&server.backend->events.new_input, &server.new_input);
+
     server.new_output.notify = server_new_output;
     // listening for new monitors
     wl_signal_add(&server.backend->events.new_output, &server.new_output);
@@ -95,6 +140,19 @@ int init_server()
 
 int cleanup_server(struct gemstone_server *server)
 {
+    // kill apps
+    wl_display_destroy_clients(server->wl_display);
+
+    // removing listeners
+    wl_list_remove(&server->new_xdg_toplevel.link);
+    wl_list_remove(&server->new_output.link);
+    wl_list_remove(&server->new_input.link);
+
+    wlr_xcursor_manager_destroy(server->cursor_mgr);
+    wlr_cursor_destroy(server->cursor);
+    wlr_output_layout_destroy(server->output_layout);
+
+    // finishing the work
     wl_display_destroy(server->wl_display);
     return EXIT_SUCCESS;
 }

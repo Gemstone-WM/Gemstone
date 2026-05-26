@@ -5,18 +5,19 @@ project(gemstone C)
 find_package(PkgConfig REQUIRED)
 pkg_check_modules(WLROOTS REQUIRED IMPORTED_TARGET wlroots-0.20)
 pkg_check_modules(WAYLAND REQUIRED IMPORTED_TARGET wayland-server)
+pkg_check_modules(XKBCOMMON REQUIRED IMPORTED_TARGET xkbcommon)
 
 add_executable(gemstone 
-src/main.c
-src/listeners.c
-src/server.c
+    src/main.c
+    src/listeners.c
+    src/server.c
 )
 
-# MUST ACKNOWLEDGE WLROOTS INSTABILITY
+
 target_compile_definitions(gemstone PRIVATE WLR_USE_UNSTABLE)
 
-# Link the libraries to your executable
 target_link_libraries(gemstone
     PkgConfig::WLROOTS
     PkgConfig::WAYLAND
+    PkgConfig::XKBCOMMON
 )
